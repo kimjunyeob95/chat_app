@@ -46,4 +46,4 @@ class Message:
 
     @staticmethod
     def get_by_room(room_id, limit=50):
-        return mongo.db.messages.find({'room_id': room_id}).sort('created_at', -1).limit(limit)
+        return mongo.db.messages.find({'room_id': room_id}).sort('created_at', 1).limit(limit)
