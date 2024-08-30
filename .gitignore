@@ -1,2 +1,3 @@
 /mongodb_data
 .env
+/app/__pycache__
