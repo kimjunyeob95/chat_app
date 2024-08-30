@@ -4,14 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Rooms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-logout {
+            background-color: #f44336;
+        }
+        .btn-logout:hover {
+            background-color: #da190b;
+        }
+        .room-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .room-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .room-link {
+            flex-grow: 1;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .room-link:hover {
+            background-color: #f5f5f5;
+        }
+        .btn-delete {
+            padding: 10px 15px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-delete:hover {
+            background-color: #ff3333;
+        }
+        .actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chat Rooms</h1>
-    <ul>
-        {% for room in rooms %}
-            <li><a href="{{ url_for('chat', room_name=room.name) }}">{{ room.name }}</a></li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('logout') }}">Logout</a>
+    <div class="container">
+        <h1>채팅방 목록</h1>
+        <ul class="room-list">
+            {% for room in rooms %}
+                <li class="room-item">
+                    <a href="{{ url_for('chat', room_name=room.name) }}" class="room-link">
+                        {{ room.name }}
+                    </a>
+                    <button class="btn-delete" onclick="deleteRoom('{{ room.name }}')">삭제</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="actions">
+            <a href="#" class="btn" id="newRoomBtn">채팅방 생성</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-logout">로그아웃</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('newRoomBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 현재 날짜와 시간 생성
+            const now = new Date();
+            const dateTime = now.getFullYear().toString() +
+                            (now.getMonth() + 1).toString().padStart(2, '0') +
+                            now.getDate().toString().padStart(2, '0') +
+                            now.getHours().toString().padStart(2, '0') +
+                            now.getMinutes().toString().padStart(2, '0') +
+                            now.getSeconds().toString().padStart(2, '0');
+            
+            // 랜덤 문자열 생성 (8자리)
+            const randomString = Math.random().toString(36).substring(2, 10);
+            
+            // 새로운 방 이름 생성
+            const newRoomName = dateTime + randomString;
+            
+            // 새로운 URL로 이동
+            window.location.href = '/chat/' + newRoomName;
+        });
+
+        function deleteRoom(roomName) {
+            fetch('/chat/' + roomName, {
+                method: 'DELETE',
+            }).then(response => {
+                response.json().then(data => {
+                    if( data.is_success ){
+                        window.location.href = '/chat_rooms';
+                    }
+                });
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            });
+        }
+    </script>
 </body>
 </html>

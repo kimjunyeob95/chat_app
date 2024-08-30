@@ -1,5 +1,6 @@
 from app import mongo
 from datetime import datetime
+from bson import ObjectId
 
 class User:
     @staticmethod
@@ -13,8 +14,14 @@ class User:
 class ChatRoom:
     @staticmethod
     def create(name):
-        return mongo.db.chat_rooms.insert_one({'name': name, 'created_at': datetime.utcnow()})
+        result      = mongo.db.chat_rooms.insert_one({'name': name, 'created_at': datetime.utcnow()})
+        inserted_id = result.inserted_id
+        return ChatRoom.find_by_id(inserted_id)
 
+    @staticmethod
+    def find_by_id(id):
+        return mongo.db.chat_rooms.find_one({'_id': ObjectId(id)})
+    
     @staticmethod
     def get_all():
         return mongo.db.chat_rooms.find()
@@ -22,6 +29,10 @@ class ChatRoom:
     @staticmethod
     def find_by_name(name):
         return mongo.db.chat_rooms.find_one({'name': name})
+    
+    @staticmethod
+    def del_by_name(name):
+        return mongo.db.chat_rooms.delete_one({'name': name})
 
 class Message:
     @staticmethod

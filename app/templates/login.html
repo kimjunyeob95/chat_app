@@ -4,12 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: white;
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input[type="text"] {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        button {
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error-message {
+            color: #ff0000;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Login</h1>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Enter your username" required>
-        <button type="submit">Login</button>
-    </form>
+    <div class="login-container">
+        <h1>사용자 정보</h1>
+        <form method="POST" onsubmit="return validateForm()">
+            <input type="text" name="username" id="username" placeholder="사용할 이름을 입력하세요." required>
+            <button type="submit">접속</button>
+        </form>
+        <p class="error-message" id="error-message"></p>
+    </div>
+
+    <script>
+        function validateForm() {
+            var username = document.getElementById('username').value;
+            var errorMessage = document.getElementById('error-message');
+            
+            if (username.trim() === '') {
+                errorMessage.textContent = '이름을 입력해주세요.';
+                return false;
+            }
+            
+            errorMessage.textContent = '';
+            return true;
+        }
+
+        // Enter 키로 로그인하기
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (validateForm()) {
+                    document.querySelector('form').submit();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

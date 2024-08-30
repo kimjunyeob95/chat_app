@@ -5,18 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat - {{ room.name }}</title>
     <style>
-        #chat-messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; }
-        .message { max-width: 70%; margin: 10px; padding: 10px; border-radius: 10px; }
-        .message.left { background-color: #e0e0e0; float: left; clear: both; }
-        .message.right { background-color: #4CAF50; color: white; float: right; clear: both; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #chat-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        #chat-messages {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .message {
+            max-width: 70%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            clear: both;
+        }
+        .message.left {
+            background-color: #e0e0e0;
+            float: left;
+        }
+        .message.right {
+            background-color: #4CAF50;
+            color: white;
+            float: right;
+        }
+        #message-input-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+        }
+        #send-button {
+            width: 70px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        #user-info {
+            text-align: right;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: #666;
+        }
+        #back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #back-link:hover {
+            background-color: #2980b9;
+        }
     </style>
 </head>
 <body>
-    <h1>Chat Room: {{ room.name }}</h1>
-    <div id="chat-messages"></div>
-    <input type="text" id="message-input" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-    <a href="{{ url_for('chat_rooms') }}">Back to Rooms</a>
+    <div id="chat-container">
+        <h1>채팅방: {{ room.name }}</h1>
+        <div id="user-info">사용자: {{ username }}</div>
+        <div id="chat-messages"></div>
+        <div id="message-input-container">
+            <input type="text" id="message-input" placeholder="메세지를 입력하세요.">
+            <button id="send-button" onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+    <a href="{{ url_for('chat_rooms') }}" id="back-link">채팅방 목록으로</a>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
@@ -43,7 +126,7 @@
 
         function sendMessage() {
             const messageInput = document.getElementById('message-input');
-            const message = messageInput.value;
+            const message = messageInput.value.trim();
             if (message) {
                 socket.emit('message', {room: room, message: message});
                 messageInput.value = '';
@@ -59,6 +142,13 @@
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+        // 엔터 키로 메시지 보내기
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
     </script>
 </body>
 </html>
