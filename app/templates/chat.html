@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - {{ room.name }}</title>
+    <style>
+        #chat-messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; }
+        .message { max-width: 70%; margin: 10px; padding: 10px; border-radius: 10px; }
+        .message.left { background-color: #e0e0e0; float: left; clear: both; }
+        .message.right { background-color: #4CAF50; color: white; float: right; clear: both; }
+    </style>
+</head>
+<body>
+    <h1>Chat Room: {{ room.name }}</h1>
+    <div id="chat-messages"></div>
+    <input type="text" id="message-input" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+    <a href="{{ url_for('chat_rooms') }}">Back to Rooms</a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const room = "{{ room.name }}";
+        const username = "{{ username }}";
+
+        socket.on('connect', () => {
+            socket.emit('join', {room: room});
+            socket.emit('get_messages', {room: room});
+        });
+
+        socket.on('message', (data) => {
+            console.log(data);
+            addMessage(data.username, data.message);
+        });
+
+        socket.on('load_messages', (data) => {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+            data.messages.forEach((msg) => {
+                addMessage(msg.username, msg.content);
+            });
+        });
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value;
+            if (message) {
+                socket.emit('message', {room: room, message: message});
+                messageInput.value = '';
+            }
+        }
+
+        function addMessage(username, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(username === "{{ username }}" ? 'right' : 'left');
+            messageElement.textContent = `${username}: ${message}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>
