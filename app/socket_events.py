@@ -1,7 +1,9 @@
-from flask import session
+from flask import session, current_app
 from flask_socketio import emit, join_room, leave_room
 from app import socketio
 from app.models import Message
+from bson import json_util
+import json
 
 @socketio.on('join')
 def on_join(data):
@@ -25,6 +27,8 @@ def on_message(data):
 
 @socketio.on('get_messages')
 def get_messages(data):
-    room = data['room']
-    messages = Message.get_by_room(room)
-    emit('load_messages', {'messages': list(messages)})
+    room          = data['room']
+    messages      = Message.get_by_room(room)
+    messages_list = list(messages)
+    json_messages = json.loads(json_util.dumps(messages_list))
+    emit('load_messages', {'messages': json_messages})

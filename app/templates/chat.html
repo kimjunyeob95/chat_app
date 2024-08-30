@@ -30,7 +30,6 @@
         });
 
         socket.on('message', (data) => {
-            console.log(data);
             addMessage(data.username, data.message);
         });
 
